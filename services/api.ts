@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
-import { parseCookies, setCookie } from 'nookies'
+import Router from 'next/router';
+import { destroyCookie, parseCookies, setCookie } from 'nookies'
 
 type FailedRequestQueue = {
   onSuccess: (token: string) => void;
@@ -10,12 +11,17 @@ let cookies = parseCookies()
 let isRefreshing = false;
 let failedRequestsQueue = Array<FailedRequestQueue>();
 
+export function signOut() {
+  destroyCookie(undefined, 'nextauth.token')
+  destroyCookie(undefined, 'nextauth.refreshToken')
+
+  Router.push('/')
+}
 export const api = axios.create({
-  baseURL: 'http://localhost:3333',
-  headers:  {
-    Authorization: `Bearer ${cookies['nextauth.token']}`
-  }
+  baseURL: 'http://localhost:3333/',
 })
+
+api.defaults.headers.common['Authorization'] = `Bearer ${cookies['nextauth.token']}`
 
 api.interceptors.response.use(response => {
   return response
@@ -74,7 +80,9 @@ api.interceptors.response.use(response => {
         })
       })
     } else {
-
+      signOut()
     }
   }
+
+  return Promise.reject(error)
 })
