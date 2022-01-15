@@ -1,6 +1,4 @@
 import { FormEvent, useContext, useState } from 'react'
-import { GetServerSideProps } from 'next'
-import { parseCookies } from 'nookies'
 
 import styles from '../styles/Home.module.css'
 import { AuthContext } from '../contexts/AuthContext'
